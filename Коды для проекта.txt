@@ -1,0 +1,182 @@
+                                Сайт для тестирования УЧЕБНЫЙ  
+
+cafe_project/
+├── manage.py
+├── cafe_project/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── cafe/
+    ├── __init__.py
+    ├── admin.py
+    ├── apps.py
+    ├── models.py
+    ├── tests.py
+    ├── urls.py
+    └── views.py
+
+========================================
+
+                                      ЗАПУСК СЕРВЕРА 
+
+                                  python manage.py runserver
+
+=========================================
+
+
+                                               HTML
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Кафе "Завтраки"</title>
+    <meta charset="utf-8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'cafe/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>🍳 Кафе "Завтраки"</h1>
+        
+        {% for category_name, items in categories.items %}
+        <div class="category">
+            <h2 class="category-title">{{ items.0.get_category_display }}</h2>
+            
+            {% for item in items %}
+            <div class="menu-item" data-item-id="{{ item.id }}">
+                <div>
+                    <span class="item-name">{{ item.name }}</span>
+                    <br>
+                    <small>{{ item.get_unit_display }}</small>
+                </div>
+                <div class="item-price">{{ item.price }} ₽</div>
+                <div class="quantity-controls">
+                    <button class="quantity-btn minus">-</button>
+                    <span class="quantity">0</span>
+                    <button class="quantity-btn plus">+</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="cart">
+        <h3>🛒 Корзина</h3>
+        <div id="cart-items"></div>
+        <div id="cart-total">Итого: 0 ₽</div>
+        <button onclick="checkout()">Оформить заказ</button>
+    </div>
+
+    <script src="{% static 'cafe/script.js' %}"></script>
+</body>
+</html>
+
+========================================
+
+
+                                JS      JAVASCRIPT
+
+let cart = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Обработчики для кнопок +/-
+    document.querySelectorAll('.quantity-btn.plus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemElement = this.closest('.menu-item');
+            const itemId = itemElement.dataset.itemId;
+            cart[itemId] = (cart[itemId] || 0) + 1;
+            updateCartDisplay();
+        });
+    });
+    
+    document.querySelectorAll('.quantity-btn.minus').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemElement = this.closest('.menu-item');
+            const itemId = itemElement.dataset.itemId;
+            if (cart[itemId] > 0) {
+                cart[itemId]--;
+                if (cart[itemId] === 0) delete cart[itemId];
+            }
+            updateCartDisplay();
+        });
+    });
+});
+
+function updateCartDisplay() {
+    document.querySelector('#cart-total').textContent = 
+        `Итого: ${calculateTotal()} ₽`;
+}
+
+function calculateTotal() {
+    return Object.values(cart).reduce((sum, qty) => sum + qty, 0) * 10;
+}
+
+function checkout() {
+    alert('Функция оформления заказа будет реализована позже');
+}
+
+============================================
+
+
+                                     CSS
+
+
+
+body { 
+    font-family: Arial, sans-serif; 
+    margin: 20px; 
+    background: #f5f5f5;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.category {
+    margin: 20px 0;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+}
+.category-title {
+    color: #333;
+    border-bottom: 2px solid #4CAF50;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
+.item-name { font-weight: bold; }
+.item-price { color: #4CAF50; }
+.quantity-controls { 
+    display: flex; 
+    align-items: center;
+    gap: 10px;
+}
+.quantity-btn { 
+    padding: 5px 10px; 
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+}
+.cart {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}

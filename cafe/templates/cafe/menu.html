@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>Кафе "Завтраки"</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кафе "Завтраки"</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'cafe/style.css' %}">
 </head>
@@ -12,20 +13,21 @@
         
         {% for category_name, items in categories.items %}
         <div class="category">
-            <h2 class="category-title">{{ items.0.get_category_display }}</h2>
+            {% with first_item=items|first %}
+            <h2 class="category-title">{% if first_item %}{{ first_item.get_category_display }}{% else %}{{ category_name }}{% endif %}</h2>
+            {% endwith %}
             
             {% for item in items %}
-            <div class="menu-item" data-item-id="{{ item.id }}">
-                <div>
+            <div class="menu-item" data-item-id="{{ item.id }}" data-item-name="{{ item.name }}" data-item-price="{{ item.price }}">
+                <div class="item-info">
                     <span class="item-name">{{ item.name }}</span>
-                    <br>
-                    <small>{{ item.get_unit_display }}</small>
+                    <small class="item-unit">{{ item.get_unit_display }}</small>
                 </div>
                 <div class="item-price">{{ item.price }} ₽</div>
                 <div class="quantity-controls">
-                    <button class="quantity-btn minus">-</button>
-                    <span class="quantity">0</span>
-                    <button class="quantity-btn plus">+</button>
+                    <button class="quantity-btn minus" type="button" aria-label="Уменьшить количество">-</button>
+                    <span class="quantity" data-item-id="{{ item.id }}">0</span>
+                    <button class="quantity-btn plus" type="button" aria-label="Увеличить количество">+</button>
                 </div>
             </div>
             {% endfor %}
@@ -37,7 +39,7 @@
         <h3>🛒 Корзина</h3>
         <div id="cart-items"></div>
         <div id="cart-total">Итого: 0 ₽</div>
-        <button onclick="checkout()">Оформить заказ</button>
+        <button id="checkout-btn" type="button">Оформить заказ</button>
     </div>
 
     <script src="{% static 'cafe/script.js' %}"></script>
